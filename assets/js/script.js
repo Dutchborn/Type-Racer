@@ -102,7 +102,7 @@ function retryTest() {
   typingArea.disabled = true; // Keep the typing area disabled
   document.getElementById("dynamic-text-container").innerHTML = "";
 
-  // Reset the timer display and results
+  // Reset the timer display
   document.getElementById("time-result").textContent = "0s";
   document.getElementById("wpm-result").textContent = "0";
   document.getElementById("accuracy-result").textContent = "0%";
@@ -119,6 +119,14 @@ function updateDynamicTextarea() {
   // Get the selected difficulty level
   const selectedDifficulty = difficultySelect.value;
 
+  // Check if there are more sentences in the current difficulty
+  if (currentSentenceIndex >= difficultyTexts[selectedDifficulty].length) {
+    calculateResults(); // Calculate results when the test is complete
+    alert("Test completed! Great job!");
+    stopTest();
+    return;
+  }
+
   // Clear any existing content in the container
   dynamicTextContainer.innerHTML = "";
 
@@ -134,18 +142,10 @@ function updateDynamicTextarea() {
 
   // Append the new textarea to the container
   dynamicTextContainer.appendChild(newTextarea);
+
+  // Increment the sentence index for the next round
+  currentSentenceIndex++;
 }
-
-// Event listener to update the dynamic textarea when the difficulty is changed
-document.getElementById("difficulty-select").addEventListener("change", () => {
-  currentSentenceIndex = 0; // Reset the sentence index
-  updateDynamicTextarea(); // Update the dynamic textarea
-});
-
-// Set the initial sentence when the page loads
-document.addEventListener("DOMContentLoaded", () => {
-  updateDynamicTextarea(); // Display the first sentence for "easy" difficulty
-});
 
 // Function to calculate results (WPM, accuracy, errors)
 function calculateResults() {
