@@ -207,3 +207,8 @@ typingArea.addEventListener("input", () => {
   }
 });
 
+document.getElementById("instructions-btn").addEventListener("click", () => {
+  const instructionsModal = new bootstrap.Modal(document.getElementById("instructionsModal"));
+  instructionsModal.show();
+});
+
