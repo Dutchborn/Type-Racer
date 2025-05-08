@@ -41,12 +41,13 @@ Type Racer is a simple and intuitive web application built with **HTML**, **CSS*
 
 ## 📂 Project Structure
 
-type-racer/
-├── index.html # Main HTML file
-├── style.css # Stylesheet for layout and responsiveness
-├── script.js # JavaScript logic (timing, feedback, scores)
-├── assets/ # (Optional) Fonts, icons, images
-└── README.md # Project documentation
+type-racer
+├── index.html
+├── readme.md
+├── userstory.md
+└── assets
+    ├── cs
+    └── js
 
 ---
 
