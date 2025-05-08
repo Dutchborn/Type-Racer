@@ -41,6 +41,15 @@ let timer = null;
 let totalWordsTyped = 0;
 let totalErrors = 0;
 
+// Disable the typing area by default
+document.getElementById("typing-area").disabled = true;
+
+// Prevent copy-paste in the typing area
+const typingArea = document.getElementById("typing-area");
+typingArea.addEventListener("copy", (e) => e.preventDefault());
+typingArea.addEventListener("cut", (e) => e.preventDefault());
+typingArea.addEventListener("paste", (e) => e.preventDefault());
+
 // Function to start the test
 function startTest() {
   if (isTestRunning) return; // Prevent multiple starts
@@ -52,8 +61,9 @@ function startTest() {
   totalErrors = 0;
 
   updateDynamicTextarea();
-  document.getElementById("typing-area").value = ""; // Clear the typing area
-  document.getElementById("typing-area").focus(); // Focus on the typing area
+  typingArea.value = ""; // Clear the typing area
+  typingArea.disabled = false; // Enable the typing area
+  typingArea.focus(); // Focus on the typing area
 
   // Display the selected difficulty in the results area
   const difficultySelect = document.getElementById("difficulty-select");
@@ -71,6 +81,9 @@ function stopTest() {
   // Stop the timer
   stopTimer();
 
+  // Disable the typing area
+  typingArea.disabled = true;
+
   alert("Test stopped. You can retry or start again.");
 }
 
@@ -85,7 +98,8 @@ function retryTest() {
   isTestRunning = false;
 
   // Clear the typing area and dynamic text container
-  document.getElementById("typing-area").value = "";
+  typingArea.value = "";
+  typingArea.disabled = true; // Keep the typing area disabled
   document.getElementById("dynamic-text-container").innerHTML = "";
 
   // Reset the timer display
@@ -105,14 +119,6 @@ function updateDynamicTextarea() {
   // Get the selected difficulty level
   const selectedDifficulty = difficultySelect.value;
 
-  // Check if there are more sentences in the current difficulty
-  if (currentSentenceIndex >= difficultyTexts[selectedDifficulty].length) {
-    calculateResults(); // Calculate results when the test is complete
-    alert("Test completed! Great job!");
-    stopTest();
-    return;
-  }
-
   // Clear any existing content in the container
   dynamicTextContainer.innerHTML = "";
 
@@ -128,10 +134,18 @@ function updateDynamicTextarea() {
 
   // Append the new textarea to the container
   dynamicTextContainer.appendChild(newTextarea);
-
-  // Increment the sentence index for the next round
-  currentSentenceIndex++;
 }
+
+// Event listener to update the dynamic textarea when the difficulty is changed
+document.getElementById("difficulty-select").addEventListener("change", () => {
+  currentSentenceIndex = 0; // Reset the sentence index
+  updateDynamicTextarea(); // Update the dynamic textarea
+});
+
+// Set the initial sentence when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  updateDynamicTextarea(); // Display the first sentence for "easy" difficulty
+});
 
 // Function to calculate results (WPM, accuracy, errors)
 function calculateResults() {
@@ -177,8 +191,7 @@ document.getElementById("stop-test-btn").addEventListener("click", stopTest);
 document.getElementById("retry-test-btn").addEventListener("click", retryTest);
 
 // Event listener to check if the user has completed the current sentence
-document.getElementById("typing-area").addEventListener("input", () => {
-  const typingArea = document.getElementById("typing-area");
+typingArea.addEventListener("input", () => {
   const dynamicTextContainer = document.getElementById("dynamic-text-container");
   const currentSentence = dynamicTextContainer.querySelector("textarea").value;
 
