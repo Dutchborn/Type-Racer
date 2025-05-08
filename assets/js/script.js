@@ -102,7 +102,7 @@ function retryTest() {
   typingArea.disabled = true; // Keep the typing area disabled
   document.getElementById("dynamic-text-container").innerHTML = "";
 
-  // Reset the timer display
+  // Reset the timer display and results
   document.getElementById("time-result").textContent = "0s";
   document.getElementById("wpm-result").textContent = "0";
   document.getElementById("accuracy-result").textContent = "0%";
