@@ -111,13 +111,16 @@ function retryTest() {
   alert("Test reset. Click 'Start Test' to begin again.");
 }
 
-// Function to update the dynamic textarea with the next sentence
+// Function to update the dynamic text container with the current sentence
 function updateDynamicTextarea() {
   const difficultySelect = document.getElementById("difficulty-select");
   const dynamicTextContainer = document.getElementById("dynamic-text-container");
 
   // Get the selected difficulty level
   const selectedDifficulty = difficultySelect.value;
+
+  // Clear any existing content in the container
+  dynamicTextContainer.innerHTML = "";
 
   // Check if there are more sentences in the current difficulty
   if (currentSentenceIndex >= difficultyTexts[selectedDifficulty].length) {
@@ -127,24 +130,15 @@ function updateDynamicTextarea() {
     return;
   }
 
-  // Clear any existing content in the container
-  dynamicTextContainer.innerHTML = "";
-
   // Get the current sentence
   const currentSentence = difficultyTexts[selectedDifficulty][currentSentenceIndex];
 
-  // Create a new textarea element
-  const newTextarea = document.createElement("textarea");
-  newTextarea.className = "form-control";
-  newTextarea.rows = 5;
-  newTextarea.readOnly = true; // Make it read-only
-  newTextarea.value = currentSentence; // Set the text
-
-  // Append the new textarea to the container
-  dynamicTextContainer.appendChild(newTextarea);
-
-  // Increment the sentence index for the next round
-  currentSentenceIndex++;
+  // Display the current sentence in the dynamic text container
+  const sentenceHTML = currentSentence
+    .split(" ")
+    .map((word) => `<span>${word}</span>`)
+    .join(" ");
+  dynamicTextContainer.innerHTML = sentenceHTML;
 }
 
 // Function to calculate results (WPM, accuracy, errors)
@@ -190,21 +184,30 @@ document.getElementById("start-test-btn").addEventListener("click", startTest);
 document.getElementById("stop-test-btn").addEventListener("click", stopTest);
 document.getElementById("retry-test-btn").addEventListener("click", retryTest);
 
+// Event listener to update the dynamic text when the difficulty is changed
+document.getElementById("difficulty-select").addEventListener("change", () => {
+  currentSentenceIndex = 0; // Reset the sentence index
+  updateDynamicTextarea(); // Update the dynamic text container
+});
+
 // Event listener to check if the user has completed the current sentence
 typingArea.addEventListener("input", () => {
   const dynamicTextContainer = document.getElementById("dynamic-text-container");
-  const currentSentence = dynamicTextContainer.querySelector("textarea").value;
+  const currentSentence = difficultyTexts[document.getElementById("difficulty-select").value][currentSentenceIndex];
+  const typedText = typingArea.value.trim();
 
   // Check if the typed text matches the current sentence
-  if (typingArea.value.trim() === currentSentence.trim()) {
+  if (typedText === currentSentence) {
     totalWordsTyped += currentSentence.split(" ").length; // Count words in the sentence
     typingArea.value = ""; // Clear the typing area
+    currentSentenceIndex++; // Move to the next sentence
     updateDynamicTextarea(); // Load the next sentence
-  } else {
-    // Count errors (difference in characters)
-    const typedText = typingArea.value;
-    totalErrors += Math.abs(currentSentence.length - typedText.length);
   }
+});
+
+// Set the initial sentence when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  updateDynamicTextarea(); // Display the first sentence for the default difficulty
 });
 
 document.getElementById("instructions-btn").addEventListener("click", () => {
